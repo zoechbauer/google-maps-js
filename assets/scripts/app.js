@@ -28,7 +28,12 @@ function initMap() {
     map: map,
     title: 'state capital of Upper Austria'
   });
-
+  // add markers to the map on click event
+  google.maps.event.addListener(map, 'click', event => {
+    console.log(event.latLng);
+    addMarker({ coords: event.latLng });
+  });
+  // create some locations as test data
   addMarkerWithInfoWindow();
   addFavoritePlaces();
 }
@@ -55,7 +60,9 @@ function addMarkerWithInfoWindow() {
   });
 }
 
+// add some test data with different properties
 function addFavoritePlaces() {
+  // array with test data
   const favoritePlaces = [
     {
       coords: Hofkirchen,
@@ -67,11 +74,12 @@ function addFavoritePlaces() {
       content: '<p>In <strong>Rohrbach</strong> I went to school</p>'
     }
   ];
-
-  favoritePlaces.forEach(place => addLocation(place));
+  // create markers
+  favoritePlaces.forEach(place => addMarker(place));
 }
 
-function addLocation(props) {
+// function for adding markers to the map
+function addMarker(props) {
   let marker = new google.maps.Marker({
     position: props.coords,
     map: map
@@ -82,7 +90,6 @@ function addLocation(props) {
   }
 
   if (props.content) {
-    console.log(props.content.substring(0, 10) + '...');
     let infoWindow = new google.maps.InfoWindow({
       content: props.content
     });
@@ -94,7 +101,6 @@ function addLocation(props) {
     marker.addListener('mouseover', e => {
       const plainText = props.content.replace(/<[^>]*>?/gm, '');
       marker.setTitle(plainText.substring(0, 10) + '...');
-      console.log('mouseover', marker.title);
     });
   }
 }
