@@ -1,16 +1,23 @@
 let map;
-function initMap() {
-  // zoom level
-  //  1 : World
-  // 5: Landmass/continent
-  // 10: City
-  // 15: Streets
-  // 20: Buildings
+// zoom level
+//  1 : World
+// 5: Landmass/continent
+// 10: City
+// 15: Streets
+// 20: Buildings
+const zoom = 9;
 
+// locations
+const Linz = { lat: 48.30639, lng: 14.28611 };
+const Wels = { lat: 48.16667, lng: 14.03333 };
+const Hofkirchen = { lat: 48.483839, lng: 13.808452 };
+const Rohrbach = { lat: 48.569687, lng: 13.989812 };
+
+// init and display map
+function initMap() {
   // map options
-  const Linz = { lat: 48.30639, lng: 14.28611 };
   const options = {
-    zoom: 10,
+    zoom: zoom,
     center: Linz
   };
   // new map
@@ -23,11 +30,11 @@ function initMap() {
   });
 
   addMarkerWithInfoWindow();
+  addFavoritePlaces();
 }
 
 // Add marker with different icon and infoWindow
 function addMarkerWithInfoWindow() {
-  const Wels = { lat: 48.16667, lng: 14.03333 };
   const marker = new google.maps.Marker({
     position: Wels,
     map: map,
@@ -46,4 +53,48 @@ function addMarkerWithInfoWindow() {
   marker.addListener('click', function() {
     infoWindow.open(map, marker);
   });
+}
+
+function addFavoritePlaces() {
+  const favoritePlaces = [
+    {
+      coords: Hofkirchen,
+      iconImage:
+        'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'
+    },
+    {
+      coords: Rohrbach,
+      content: '<p>In <strong>Rohrbach</strong> I went to school</p>'
+    }
+  ];
+
+  favoritePlaces.forEach(place => addLocation(place));
+}
+
+function addLocation(props) {
+  let marker = new google.maps.Marker({
+    position: props.coords,
+    map: map
+  });
+
+  if (props.iconImage) {
+    marker.setIcon(props.iconImage);
+  }
+
+  if (props.content) {
+    console.log(props.content.substring(0, 10) + '...');
+    let infoWindow = new google.maps.InfoWindow({
+      content: props.content
+    });
+
+    marker.addListener('click', e => {
+      infoWindow.open(map, marker);
+    });
+
+    marker.addListener('mouseover', e => {
+      const plainText = props.content.replace(/<[^>]*>?/gm, '');
+      marker.setTitle(plainText.substring(0, 10) + '...');
+      console.log('mouseover', marker.title);
+    });
+  }
 }
